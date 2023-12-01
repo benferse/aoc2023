@@ -69,8 +69,8 @@ mod answers {
 
     #[test_case(SAMPLE_INPUT_2 => 281; "with sample input")]
     #[test_case(PERSONAL_INPUT => 54845; "with real input")]
-    pub fn problem2(lines: &str) -> u32 {
-        lines.trimmed_lines()
+    pub fn problem2(input: &str) -> u32 {
+        input.trimmed_lines()
             .map(calibration_v2)
             .sum()
     }
