@@ -55,14 +55,14 @@ fn is_digit_or_number_word(text: &str) -> Option<u32> {
 
 #[cfg(test)]
 mod answers {
+    use crate::prelude::*;
     use super::*;
     use test_case::test_case;
 
     #[test_case(SAMPLE_INPUT_1 => 142; "with sample input")]
     #[test_case(PERSONAL_INPUT => 55090; "with real input")]
     pub fn problem1(input: &str) -> u32 {
-        input.lines()
-            .map(str::trim)
+        input.trimmed_lines()
             .map(calibration_v1)
             .sum()
     }
@@ -70,8 +70,7 @@ mod answers {
     #[test_case(SAMPLE_INPUT_2 => 281; "with sample input")]
     #[test_case(PERSONAL_INPUT => 54845; "with real input")]
     pub fn problem2(lines: &str) -> u32 {
-        lines.lines()
-            .map(str::trim)
+        lines.trimmed_lines()
             .map(calibration_v2)
             .sum()
     }
