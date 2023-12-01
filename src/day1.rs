@@ -25,6 +25,12 @@ pub fn calibration_v1(line: &str) -> u32 {
 /// Given a line of text from the document, find the
 /// calibration value, assuming english digit words are
 /// their corresponding digits
+///
+/// ```
+/// # use aoc2023::day1::*;
+/// assert_eq!(calibration_v2("two1nine"), 29);
+/// assert_eq!(calibration_v2("eightwo"), 82);
+/// ```
 pub fn calibration_v2(line: &str) -> u32 {
     let first = (0..line.len())
         .find_map(|idx| is_digit_or_number_word(&line[idx..]))
