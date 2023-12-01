@@ -53,42 +53,37 @@ mod answers {
     use test_case::test_case;
 
     #[test_case(SAMPLE_INPUT_1 => 142; "with sample input")]
-    #[test_case(personal_input().as_slice() => 55090; "with real input")]
-    pub fn problem1(lines: &[&str]) -> u32 {
-        lines.iter()
-            .map(|line| calibration_v1(line))
+    #[test_case(PERSONAL_INPUT => 55090; "with real input")]
+    pub fn problem1(input: &str) -> u32 {
+        input.lines()
+            .map(str::trim)
+            .map(calibration_v1)
             .sum()
     }
 
     #[test_case(SAMPLE_INPUT_2 => 281; "with sample input")]
-    #[test_case(personal_input().as_slice() => 54845; "with real input")]
-    pub fn problem2(lines: &[&str]) -> u32 {
-        lines.iter()
-            .map(|line| calibration_v2(line))
+    #[test_case(PERSONAL_INPUT => 54845; "with real input")]
+    pub fn problem2(lines: &str) -> u32 {
+        lines.lines()
+            .map(str::trim)
+            .map(calibration_v2)
             .sum()
     }
 
-    fn personal_input() -> Vec<&'static str> {
-        include_str!("./input/day1.txt")
-            .lines()
-            .map(str::trim)
-            .collect()
-    }
+    const SAMPLE_INPUT_1: &str =
+       "1abc2
+        pqr3stu8vwx
+        a1b2c3d4e5f
+        treb7uchet";
 
-    const SAMPLE_INPUT_1: &[&str] = &[
-        "1abc2",
-        "pqr3stu8vwx",
-        "a1b2c3d4e5f",
-        "treb7uchet",
-    ];
+    const SAMPLE_INPUT_2: &str =
+       "two1nine
+        eightwothree
+        abcone2threexyz
+        xtwone3four
+        4nineeightseven2
+        zoneight234
+        7pqrstsixteen";
 
-    const SAMPLE_INPUT_2: &[&str] = &[
-        "two1nine",
-        "eightwothree",
-        "abcone2threexyz",
-        "xtwone3four",
-        "4nineeightseven2",
-        "zoneight234",
-        "7pqrstsixteen",
-    ];
+    const PERSONAL_INPUT: &str = include_str!("./input/day1.txt");
 }
