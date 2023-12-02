@@ -3,6 +3,7 @@
 #![feature(lazy_cell)]
 
 pub mod day1;
+pub mod day2;
 
 pub mod prelude {
     pub struct TrimmedLines<'a>(std::str::Lines<'a>);
