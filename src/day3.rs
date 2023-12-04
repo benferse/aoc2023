@@ -50,22 +50,16 @@ mod answers {
     #[test_case(SAMPLE_INPUT => 4361; "with sample data")]
     #[test_case(PERSONAL_INPUT => 536202; "with real data")]
     pub fn problem1(input: &str) -> u32 {
-        let engine = parse_schematic(input);
-        engine.values().flat_map(|v| v.1.iter()).sum()
+        parse_schematic(input).values()
+            .flat_map(|symbol| symbol.1.iter()).sum()
     }
 
     #[test_case(SAMPLE_INPUT => 467835; "with sample data")]
     #[test_case(PERSONAL_INPUT => 78272573; "with real data")]
     pub fn problem2(input: &str) -> u32 {
-        let engine = parse_schematic(input);
-        engine.iter()
-            .filter_map(|(_, v)| {
-                if v.0 == b'*' && v.1.len() == 2 {
-                    Some(v.1[0] * v.1[1])
-                } else {
-                    None
-                }
-            })
+        parse_schematic(input).values()
+            .filter(|&symbol| symbol.0 == b'*' && symbol.1.len() == 2)
+            .map(|gear| gear.1[0] * gear.1[1])
             .sum()
     }
 
