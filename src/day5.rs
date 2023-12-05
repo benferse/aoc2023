@@ -1,35 +1,11 @@
 //! Day 5 - If You Give A Seed A Fertilizer
 
-#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MapEntry {
     dst: u64,
     src: u64,
     len: u64,
 }
 
-impl MapEntry {
-    pub fn new(dst: u64, src: u64, len: u64) -> Self {
-        Self { dst, src, len }
-    }
-
-    pub fn process(&self, input: u64) -> Option<u64> {
-        if input >= self.src && input < self.src + self.len {
-            Some(input+self.dst-self.src)
-        } else {
-            None
-        }
-    }
-
-    pub fn reverse(&self, input: u64) -> Option<u64> {
-        if input >= self.dst && input < self.dst + self.len {
-            Some(input+self.src-self.dst)
-        } else {
-            None
-        }
-    }
-}
-
-#[derive(Clone, Debug)]
 pub struct Map {
     entries: Vec<MapEntry>,
 }
@@ -43,20 +19,49 @@ impl From<Vec<MapEntry>> for Map {
 impl Map {
     pub fn process(&self, input: u64) -> u64 {
         self.entries.iter()
-            .find_map(|entry| entry.process(input))
+            .find_map(|entry| {
+                if input >= entry.src && input < entry.src + entry.len {
+                    Some(input + entry.dst - entry.src)
+                } else {
+                    None
+                }
+            })
             .or(Some(input))
             .expect("Should always map to something")
     }
 
-    pub fn reverse(&self, input: u64) -> u64 {
-        self.entries.iter()
-            .find_map(|entry| entry.reverse(input))
-            .or(Some(input))
-            .expect("Should always map to something")
+    pub fn process_ranges(&self, mut input: Vec<(u64, u64)>) -> Vec<(u64, u64)> {
+        let mut processed = vec![];
+
+        for entry in &self.entries {
+            let mut pending = vec![];
+
+            while let Some((start, end)) = input.pop() {
+                let preceeding = (start, end.min(entry.src));
+                let overlap = (start.max(entry.src), end.min(entry.src + entry.len));
+                let trailing = (start.max(entry.src + entry.len), end);
+
+                if preceeding.1 > preceeding.0 {
+                    pending.push(preceeding);
+                }
+
+                if overlap.1 > overlap.0 {
+                    processed.push((overlap.0 + entry.dst - entry.src, overlap.1 + entry.dst - entry.src));
+                }
+
+                if trailing.1 > trailing.0 {
+                    pending.push(trailing);
+                }
+            }
+
+            input = pending;
+        }
+
+        processed.extend(input);
+        processed
     }
 }
 
-#[derive(Clone, Debug, Default)]
 pub struct Almanac {
     pub seeds: Vec<u64>,
     pub maps: Vec<Map>,
@@ -64,30 +69,29 @@ pub struct Almanac {
 
 impl Almanac {
     pub fn parse(input: &str) -> Self {
-        let mut almanac = Self::default();
         let blocks: Vec<&str> = input.split("\n\n").collect();
 
         // First extract the seeds from the opening line
-        blocks[0]
+        let seeds = blocks[0]
             .split_once(':').expect("Should have started with 'seeds:'")
             .1
             .split_whitespace()
             .flat_map(str::parse::<u64>)
-            .collect_into(&mut almanac.seeds);
+            .collect();
 
         // Then each of the rest of the blocks is a map
-        blocks[1..].iter()
+        let maps = blocks[1..].iter()
             .map(|&block| {
                 let entries = block.lines()
                     .skip(1)
                     .map(|line| line.split_whitespace().flat_map(str::parse::<u64>).collect::<Vec<_>>())
-                    .map(|nums| MapEntry::new(nums[0], nums[1], nums[2]))
+                    .map(|nums| MapEntry{ dst: nums[0], src: nums[1], len: nums[2] })
                     .collect::<Vec<_>>();
                 Map::from(entries)
             })
-        .collect_into(&mut almanac.maps);
+        .collect();
 
-        almanac
+        Self { seeds, maps }
     }
 
     pub fn process(&self, input: u64) -> u64 {
@@ -96,9 +100,9 @@ impl Almanac {
         })
     }
 
-    pub fn reverse(&self, input: u64) -> u64 {
-        self.maps.iter().rev().fold(input, |accum, x| {
-            x.reverse(accum)
+    pub fn process_ranges(&self, input: Vec<(u64, u64)>) -> Vec<(u64, u64)> {
+        self.maps.iter().fold(input, |accum, x| {
+            x.process_ranges(accum)
         })
     }
 }
@@ -118,32 +122,18 @@ mod answers {
             .expect("Should have mapped to something")
     }
 
-    #[test_case(SAMPLE_INPUT, 35 => 13; "what seed in location 35")]
-    #[test_case(SAMPLE_INPUT, 86 => 55; "what seed in location 86")]
-    #[test_case(SAMPLE_INPUT, 43 => 14; "what seed in location 43")]
-    #[test_case(SAMPLE_INPUT, 82 => 79; "what seed in location 82")]
-    pub fn validate_reverse(input: &str, location: u64) -> u64 {
-        let almanac = Almanac::parse(input);
-        almanac.reverse(location)
-    }
-
     #[test_case(SAMPLE_INPUT => 46; "with sample data")]
     #[test_case(PERSONAL_INPUT => 57451709; "with real data")]
     pub fn problem2(input: &str) -> u64 {
         let almanac = Almanac::parse(input);
         let seed_ranges = almanac.seeds.iter()
             .array_chunks::<2>()
-            .map(|[&start, &len]| (start..start+len))
+            .map(|[&start, &len]| (start, start+len))
             .collect::<Vec<_>>();
 
-        for candidate in 0.. {
-            let seed_for_loc = almanac.reverse(candidate);
-            if seed_ranges.iter().any(|elem| elem.contains(&seed_for_loc)) {
-                return candidate;
-            }
-        }
-
-        unreachable!("All that work for nothing");
+        let mut x = almanac.process_ranges(seed_ranges);
+        x.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+        x[0].0
     }
 
     const SAMPLE_INPUT: &str = 
