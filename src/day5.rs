@@ -1,32 +1,28 @@
 //! Day 5 - If You Give A Seed A Fertilizer
 
-use std::ops::Range;
-
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MapEntry {
-    source_range: Range<u64>,
-    dest_range: Range<u64>,
+    dst: u64,
+    src: u64,
+    len: u64,
 }
 
 impl MapEntry {
     pub fn new(dst: u64, src: u64, len: u64) -> Self {
-        Self {
-            source_range: src..src+len,
-            dest_range: dst..dst+len,
-        }
+        Self { dst, src, len }
     }
 
     pub fn process(&self, input: u64) -> Option<u64> {
-        if self.source_range.contains(&input) {
-            Some(self.dest_range.start + (input - self.source_range.start))
+        if input >= self.src && input < self.src + self.len {
+            Some(input+self.dst-self.src)
         } else {
             None
         }
     }
 
     pub fn reverse(&self, input: u64) -> Option<u64> {
-        if self.dest_range.contains(&input) {
-            Some(self.source_range.start + (input - self.dest_range.start))
+        if input >= self.dst && input < self.dst + self.len {
+            Some(input+self.src-self.dst)
         } else {
             None
         }
@@ -39,11 +35,8 @@ pub struct Map {
 }
 
 impl From<Vec<MapEntry>> for Map {
-    fn from(mut value: Vec<MapEntry>) -> Self {
-        value.sort_unstable_by(|lhs, rhs| lhs.source_range.start.cmp(&rhs.source_range.start));
-        Self {
-            entries: value
-        }
+    fn from(value: Vec<MapEntry>) -> Self {
+        Self { entries: value }
     }
 }
 
