@@ -38,12 +38,12 @@ impl Hand {
             // the highest total so far - e.g. the element with the highest
             // frequency and card value
             if let Some(num_jokers) = frequencies.get(JOKER) {
-                let mut x = frequencies.iter().filter(|e| e.0 != JOKER).collect::<Vec<_>>();
-                x.sort_unstable_by(compare_freq);
+                let mut non_jokers = frequencies.iter().filter(|e| e.0 != JOKER).collect::<Vec<_>>();
+                non_jokers.sort_unstable_by(compare_freq);
 
                 // If there were non-jokers, adjust the counts of the highest other
                 // card and remove the jokers.
-                if let Some((&best_card, _)) = x.first() {
+                if let Some((&best_card, _)) = non_jokers.first() {
                     let num_jokers = *num_jokers;
                     frequencies.entry(best_card).and_modify(|e| *e += num_jokers);
                     frequencies.remove(JOKER);
