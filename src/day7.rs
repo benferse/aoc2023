@@ -9,13 +9,6 @@ pub struct Hand {
     bid: usize,
 }
 
-pub fn compare_freq(lhs: &(&char, &u8), rhs: &(&char, &u8)) -> Ordering {
-    match rhs.1.cmp(lhs.1) {
-        Ordering::Equal => rhs.0.cmp(lhs.0),
-        other => other,
-    }
-}
-
 const RANKS_SANS_JOKERS: &str = "23456789TJQKA";
 const RANKS_WITH_JOKERS: &str = "J23456789TQKA";
 const JOKER: &char = &'J';
@@ -39,7 +32,12 @@ impl Hand {
             // frequency and card value
             if let Some(num_jokers) = frequencies.get(JOKER) {
                 let mut non_jokers = frequencies.iter().filter(|e| e.0 != JOKER).collect::<Vec<_>>();
-                non_jokers.sort_unstable_by(compare_freq);
+                non_jokers.sort_unstable_by(|lhs, rhs| {
+                    match rhs.1.cmp(lhs.1) {
+                        Ordering::Equal => ranks.find(*rhs.0).unwrap().cmp(&ranks.find(*lhs.0).unwrap()),
+                        other => other,
+                    }
+                });
 
                 // If there were non-jokers, adjust the counts of the highest other
                 // card and remove the jokers.
