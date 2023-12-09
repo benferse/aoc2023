@@ -52,6 +52,7 @@ impl<'a> Map<'a> {
 
 #[cfg(test)]
 mod answers {
+    use crate::prelude::*;
     use super::*;
     use test_case::test_case;
 
@@ -73,7 +74,7 @@ mod answers {
         let map = Map::parse(input);
         map.part2_nodes()
             .map(|&start| { map.count_steps_until(start, |x| x.ends_with('Z')) })
-            .reduce(num::integer::lcm)
+            .reduce(lcm)
             .expect("Well that's just bad math")
     }
 }
