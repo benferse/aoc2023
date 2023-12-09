@@ -21,6 +21,7 @@ pub fn extrapolate(source: Vec<i64>) -> Vec<Vec<i64>> {
 
 #[cfg(test)]
 mod answers {
+    use crate::prelude::strings::*;
     use super::*;
     use test_case::test_case;
 
@@ -32,7 +33,7 @@ mod answers {
     #[test_case(PERSONAL_INPUT, false => 1974232246; "with personal input forward")]
     #[test_case(PERSONAL_INPUT, true => 928; "with personal input reversed")]
     pub fn problem1(input: &str, reverse: bool) -> i64 {
-        input.lines().map(|line| {
+        input.map_lines(|line| {
             let mut seq = parse(line);
             if reverse { seq.reverse(); }
             extrapolate(seq).iter().map(|v| v[v.len() - 1]).sum::<i64>()

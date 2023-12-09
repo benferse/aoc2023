@@ -41,16 +41,14 @@ impl Bag {
 
 #[cfg(test)]
 mod answers {
-    use crate::prelude::*;
+    use crate::prelude::strings::*;
     use super::*;
     use test_case::test_case;
 
     #[test_case(SAMPLE_INPUT => 8; "with sample data")]
     #[test_case(PERSONAL_INPUT => 2156; "with real data")]
     pub fn problem1(input: &str) -> usize {
-        input
-            .trimmed_lines()
-            .map(Bag::parse)
+        input.map_lines(Bag::parse)
             .enumerate()
             .filter(|(_, bag)| bag.max_red <= 12 && bag.max_green <= 13 && bag.max_blue <= 14)
             .map(|(idx, _)| idx + 1)
@@ -60,9 +58,7 @@ mod answers {
     #[test_case(SAMPLE_INPUT => 2286; "with sample data")]
     #[test_case(PERSONAL_INPUT => 66909; "with real data")]
     pub fn problem2(input: &str) -> usize {
-        input
-            .trimmed_lines()
-            .map(Bag::parse)
+        input.map_lines(Bag::parse)
             .map(|bag| bag.max_red * bag.max_blue * bag.max_green)
             .sum()
     }

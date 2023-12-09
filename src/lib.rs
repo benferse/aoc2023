@@ -6,6 +6,8 @@
 #![feature(iter_map_windows)]
 #![feature(lazy_cell)]
 
+pub mod prelude;
+
 pub mod day1;
 pub mod day2;
 pub mod day3;
@@ -16,37 +18,3 @@ pub mod day7;
 
 pub mod day8;
 pub mod day9;
-
-pub mod prelude {
-    pub struct TrimmedLines<'a>(std::str::Lines<'a>);
-
-    impl<'a> Iterator for TrimmedLines<'a> {
-        type Item = &'a str;
-
-        fn next(&mut self) -> Option<Self::Item> {
-            self.0.next().map(str::trim)
-        }
-    }
-
-    pub trait HasTrimmedLines {
-        fn trimmed_lines(&self) -> TrimmedLines;
-    }
-
-    impl HasTrimmedLines for &str {
-        fn trimmed_lines(&self) -> TrimmedLines {
-            TrimmedLines(self.lines())
-        }
-    }
-
-    pub fn gcd<T: num_traits::Num + Copy>(lhs: T, rhs: T) -> T {
-        if rhs.is_zero() {
-            lhs
-        } else {
-            gcd(rhs, lhs % rhs)
-        }
-    }
-
-    pub fn lcm<T: num_traits::Num + Copy>(lhs: T, rhs: T) -> T {
-        (lhs * rhs) as T / gcd(lhs, rhs) as T
-    }
-}

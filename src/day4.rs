@@ -37,23 +37,20 @@ impl Card {
 
 #[cfg(test)]
 mod answers {
-    use crate::prelude::*;
+    use crate::prelude::strings::*;
     use super::*;
     use test_case::test_case;
 
     #[test_case(SAMPLE_INPUT => 13; "with sample data")]
     #[test_case(PERSONAL_INPUT => 23941; "with real data")]
     pub fn problem1(input: &str) -> usize {
-        input.trimmed_lines()
-            .map(|line| Card::parse(line).points())
-            .sum()
+        input.map_lines(|line| Card::parse(line).points()).sum()
     }
 
     #[test_case(SAMPLE_INPUT => 30; "with sample data")]
     #[test_case(PERSONAL_INPUT => 5571760; "with personal data")]
     pub fn problem2(input: &str) -> usize {
-        input.trimmed_lines()
-            .map(|line| Card::parse(line).winners())
+        input.map_lines(|line| Card::parse(line).winners())
             .enumerate()
             .fold(vec![], |mut counts, (idx, winners)| {
                 // Need room for num_hits more elements at least

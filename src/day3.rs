@@ -1,6 +1,5 @@
 //! Day 3 - Gear ratios
 
-use crate::prelude::*;
 use regex::Regex;
 use std::collections::HashMap;
 
@@ -8,7 +7,7 @@ pub type Schematic = HashMap<(usize, usize), (u8, Vec<u32>)>;
 
 pub fn parse_schematic(input: &str) -> Schematic {
     // First collect the location of all of the symbols in the input
-    let schematic = input.trimmed_lines().enumerate().fold(Default::default(), |mut schematic, (row, line)| {
+    let schematic = input.lines().enumerate().fold(Default::default(), |mut schematic, (row, line)| {
         // Collect the location of all of the symbols on this line
         line.as_bytes().iter().enumerate()
             .filter_map(|(col, &ch)| {
@@ -24,7 +23,7 @@ pub fn parse_schematic(input: &str) -> Schematic {
     });
 
     // Now scan for all of the numbers and see what symbols they're near
-    input.trimmed_lines().enumerate().fold(schematic, |mut schematic, (row, line)| {
+    input.lines().enumerate().fold(schematic, |mut schematic, (row, line)| {
         let re = Regex::new(r"\d+").expect("Should have been a valid regex");
         for needle in re.find_iter(line) {
             let num: u32 = needle.as_str().parse().expect("Should have been a valid number");
@@ -63,17 +62,6 @@ mod answers {
             .sum()
     }
 
-    const SAMPLE_INPUT: &str = 
-        "467..114..
-        ...*......
-        ..35..633.
-        ......#...
-        617*......
-        .....+.58.
-        ..592.....
-        ......755.
-        ...$.*....
-        .664.598..";
-
-    const PERSONAL_INPUT: &str = include_str!("./input/day3.txt");
+    const SAMPLE_INPUT: &str = include_str!("./input/day3-sample.txt");
+    const PERSONAL_INPUT: &str = include_str!("./input/day3-real.txt");
 }
