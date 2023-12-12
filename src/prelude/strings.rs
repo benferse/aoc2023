@@ -32,3 +32,13 @@ impl<'a, T: AsRef<str>> StrExt<'a> for T {
         MapLines(self.as_ref().lines().map(f))
     }
 }
+
+pub trait Join<'a> {
+    fn join(self, sep: &'a str) -> String;
+}
+
+impl<'a, T> Join<'a> for T where T: Iterator<Item = &'a str> {
+    fn join(self, sep: &'a str) -> String {
+        self.intersperse(sep).collect()
+    }
+}

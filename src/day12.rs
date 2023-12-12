@@ -1,5 +1,6 @@
 //! Day 12 - Hot Springs
 
+use crate::prelude::strings::*;
 use std::iter::once;
 
 #[derive(Debug)]
@@ -15,7 +16,7 @@ impl Record {
         // Pre-process the spring layout so we don't have to do it later. Trailing
         // empty spaces can be ignored, and add one at the beginning to make the
         // off-by-ones during counting less awful lol
-        let x = once(x).cycle().take(num_folds).intersperse("?").collect::<String>();
+        let x = once(x).cycle().take(num_folds).join("?");
         let spring_layout = format!(".{}", x.trim_end_matches('.')).chars().collect();
 
         // For the group sizes, just split and duplicate them
@@ -54,7 +55,7 @@ impl Record {
             let mut current_table = vec![0; self.spring_layout.len() + 1];
             let mut non_empty_spots = 0;
 
-            for (i, &ch) in self.spring_layout.iter().enumerate() {
+            for (position, &ch) in self.spring_layout.iter().enumerate() {
                 // Did we just leave the last contiguous block of
                 // springs or potential springs?
                 if ch != '.' {
@@ -65,24 +66,28 @@ impl Record {
 
                 // If the current spot isn't known to be a spring, then we
                 // know we can fit at least as many permutations as we could as
-                // of the last position for the current grouping
+                // of the last position for the current grouping. In other words,
+                // if it isn't certain that we just moved onto a spring, we can do
+                // at least as good as we could in the last position.
                 if ch != '#' {
-                    current_table[i + 1] += current_table[i];
+                    current_table[position + 1] += current_table[position];
                 }
 
                 // If we found a section that can fit the current group and it's *not*
                 // an extension of the previous contiguous block, then the previous
                 // m-1 groupings can all be handled by regions preceding this one,
                 // so add those in as well
-                if non_empty_spots >= group_size && self.spring_layout[i - group_size] != '#' {
-                    current_table[i + 1] += previous_table[i - group_size];
+                if non_empty_spots >= group_size && self.spring_layout[position - group_size] != '#' {
+                    current_table[position + 1] += previous_table[position - group_size];
                 }
             }
 
             previous_table = current_table;
         }
 
-        *previous_table.last().unwrap()
+        // The final entry in the final row of the table is our
+        // answer
+        previous_table[self.spring_layout.len()]
     }
 }
 
