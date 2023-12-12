@@ -3,6 +3,7 @@
 #![feature(binary_heap_into_iter_sorted)]
 #![feature(iter_array_chunks)]
 #![feature(iter_collect_into)]
+#![feature(iter_intersperse)]
 #![feature(iter_map_windows)]
 #![feature(lazy_cell)]
 
@@ -20,3 +21,4 @@ pub mod day8;
 pub mod day9;
 pub mod day10;
 pub mod day11;
+pub mod day12;
