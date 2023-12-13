@@ -38,16 +38,13 @@ impl Pattern {
     }
 }
 
+// Find a reflection that contains exactly _tolerance_ errors
 fn find_incidence(values: &[u32], tolerance: u32) -> usize {
     for (i, _) in values.windows(2).enumerate() {
-        let backwards = &values[..=i];
-        let forwards = &values[i+1..];
+        let q = values[..=i].iter().rev();
+        let p = values[i+1..].iter();
 
-        let q = backwards.iter().rev();
-        let p = forwards.iter();
-
-        let differences: u32 = q.zip(p).filter(|(&a, &b)| a != b).map(|(a, b)| (a ^ b).count_ones()).sum();
-        if differences == tolerance {
+        if tolerance == q.zip(p).filter(|(&a, &b)| a != b).map(|(a, b)| (a ^ b).count_ones()).sum() {
             return i + 1;
         }
     }
