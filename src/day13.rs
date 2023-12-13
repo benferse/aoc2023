@@ -38,10 +38,6 @@ impl Pattern {
     }
 }
 
-fn correct_smudge(lhs: &u32, rhs: &u32) -> bool {
-    (lhs ^ rhs) & ((lhs ^ rhs) - 1) == 0
-}
-
 fn find_incidence(values: &[u32], tolerance: u32) -> usize {
     for (i, _) in values.windows(2).enumerate() {
         let backwards = &values[..=i];
@@ -50,20 +46,8 @@ fn find_incidence(values: &[u32], tolerance: u32) -> usize {
         let q = backwards.iter().rev();
         let p = forwards.iter();
 
-        let (is_valid, num_smudges) = q.zip(p).fold((true, 0), |mut state, (a, b)| {
-            // If the reflecton is still valid but we noted a difference, allow
-            // at most tolerance smudges
-            if state.0 && a != b {
-                if state.1 < tolerance && correct_smudge(a, b) {
-                    state.1 += 1;
-                } else {
-                    state.0 = false;
-                }
-            }
-            state
-        });
-
-        if is_valid && num_smudges == tolerance {
+        let differences: u32 = q.zip(p).filter(|(&a, &b)| a != b).map(|(a, b)| (a ^ b).count_ones()).sum();
+        if differences == tolerance {
             return i + 1;
         }
     }
