@@ -1,41 +1,22 @@
 //! Day 13 - Point of Incidence
 
-pub struct Pattern {
-    rows: Vec<u32>,
-    cols: Vec<u32>,
-}
+pub fn parse_image(input: &str) -> (Vec<u32>, Vec<u32>) {
+    let lines = input.lines().collect::<Vec<_>>();
+    let nrows = lines.len();
+    let ncols = lines[0].len();
 
-impl Pattern {
-    pub fn parse(input: &str) -> Self {
-        let lines = input.lines().collect::<Vec<_>>();
-
-        let nrows = lines.len();
-        let ncols = lines[0].len();
-
-        let mut rows = vec![0; nrows];
-        let mut cols = vec![0; ncols];
-
-        // <-------- x
-        // #.#.#.#.#.# y
-        // #.#.#.#.#.# |
-        // #.#.#.#.#.# |
-        // #.#.#.#.#.# v
-
-        for (y, line) in lines.iter().enumerate() {
-            for (x, ch) in line.chars().rev().enumerate() {
-                if ch == '#' {
-                    rows[y] |= 1 << x;
-                    cols[ncols-x-1] |= 1 << (nrows-y-1);
-                }
+    let mut rows = vec![0; nrows];
+    let mut cols = vec![0; ncols];
+    for (y, line) in lines.iter().enumerate() {
+        for (x, ch) in line.chars().rev().enumerate() {
+            if ch == '#' {
+                rows[y] |= 1 << x;
+                cols[ncols-x-1] |= 1 << (nrows-y-1);
             }
         }
-
-        Self { rows, cols }
     }
 
-    pub fn score(&self, tolerance: u32) -> usize {
-        find_incidence(&self.rows, tolerance) * 100 + find_incidence(&self.cols, tolerance)
-    }
+   (rows, cols)
 }
 
 // Find a reflection that contains exactly _tolerance_ errors
@@ -65,8 +46,10 @@ mod answers {
     #[test_case(SAMPLE, 1 => 400; "with sample data and smudges")]
     #[test_case(PERSONAL, 1 => 30449; "with personal data and smudges")]
     pub fn problem_1_and_2(input: &str, tolerance: u32) -> usize {
-        input.split("\n\n")
-            .map(|p| Pattern::parse(p).score(tolerance))
-            .sum()
+        input.split("\n\n").map(|image| {
+            let (rows, cols) = parse_image(image);
+            find_incidence(&rows, tolerance) * 100 + find_incidence(&cols, tolerance)
+        })
+        .sum()
     }
 }
