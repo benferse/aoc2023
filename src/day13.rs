@@ -20,7 +20,7 @@ pub fn parse_image(input: &str) -> (Vec<u32>, Vec<u32>) {
 }
 
 // Find a reflection that contains exactly _tolerance_ errors
-fn find_incidence(values: &[u32], tolerance: u32) -> usize {
+pub fn find_incidence(values: &[u32], tolerance: u32) -> usize {
     for (i, _) in values.windows(2).enumerate() {
         let q = values[..=i].iter().rev();
         let p = values[i+1..].iter();
