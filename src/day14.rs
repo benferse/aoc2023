@@ -109,8 +109,23 @@ mod answers {
                 .rotate_right()
     }
 
+    use std::collections::HashMap;
+
     #[test_case(SAMPLE => 64; "with sample data")]
+    #[test_case(PERSONAL => 93102; "with personal data")]
     pub fn problem2(input: &str) -> usize {
-        0
+        let mut platform = Platform::parse(input);
+        let mut cache = HashMap::new();
+
+        for i in 1..1_000_000_000 {
+            platform = do_cycle(platform);
+            if let Some(seen) = cache.insert(platform.clone(), i) {
+                if (1_000_000_000 - i) % (i - seen) == 0 {
+                    break;
+                }
+            }
+        }
+
+        platform.calc_weight()
     }
 }
