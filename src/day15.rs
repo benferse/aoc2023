@@ -52,7 +52,7 @@ mod answers {
         for (label, op, arg) in input.trim_end().split(',').map(parse_step) {
             let this_box = &mut boxes[holiday_hash(label)];
             match (op, arg) {
-                ('-', _) => {
+                ('-', None) => {
                     this_box.retain(|b| b.0 != label);
                 },
                 ('=', Some(flen)) => {
